@@ -4,11 +4,9 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
-
-
 ARG DEBIAN_FRONTEND=noninteractive
-# Install system dependencies required for mysqlclient
-RUN apt-get update && apt-get install -y gcc default-libmysqlclient-dev pkg-config && \
+# Add curl to the installation list
+RUN apt-get update && apt-get install -y gcc default-libmysqlclient-dev pkg-config curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements file to leverage Docker cache
