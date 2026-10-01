@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DevOps Task Board</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <section class="hero">
+            <p class="eyebrow">Two-tier Flask application</p>
+            <h1>DevOps Task Board</h1>
+            <p class="subtitle">A simple Flask website backed by MySQL and running in Docker.</p>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="messages">
+                    {% for category, message in messages %}
+                        <p class="message {{ category }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if database_error %}
+            <div class="notice error">The database is not available yet. Refresh the page in a moment.</div>
+        {% endif %}
+
+        <section class="card">
+            <form method="post" class="task-form">
+                <label for="title">Add a task</label>
+                <div class="form-row">
+                    <input id="title" name="title" type="text" maxlength="255"
+                           placeholder="e.g. Deploy the application" required>
+                    <button type="submit">Add task</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card">
+            <div class="section-heading">
+                <h2>Tasks</h2>
+                <span class="count">{{ tasks|length }}</span>
+            </div>
+            {% if tasks %}
+                <ul class="task-list">
+                    {% for task in tasks %}
+                        <li>
+                            <span>{{ task.title }}</span>
+                            <form method="post" action="{{ url_for('delete_task', task_id=task.id) }}">
+                                <button class="delete" type="submit" aria-label="Delete {{ task.title }}">Delete</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty">No tasks yet. Add your first task above.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

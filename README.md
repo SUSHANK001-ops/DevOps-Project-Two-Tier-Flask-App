@@ -14,14 +14,13 @@ keeps the database data across container restarts.
 
 | File | Purpose |
 | --- | --- |
+| [`app.py`](./app.py) | Flask web application with task creation, deletion, and database health checks. |
+| [`requirements.txt`](./requirements.txt) | Python dependencies installed into the Flask image. |
+| [`templates/index.html`](./templates/index.html) | User interface for the task board. |
+| [`static/style.css`](./static/style.css) | Styling for the web interface. |
 | [`Dockerfile`](./Dockerfile) | Builds the Flask application image with Python 3.9. |
 | [`docker-compose.yml`](./docker-compose.yml) | Runs the Flask and MySQL services together. |
 | [`Jenkinsfile`](./Jenkinsfile) | Defines the Jenkins build and deployment pipeline. |
-
-The Dockerfile expects the application source and dependency files
-(`app.py` and `requirements.txt`) in the repository root. Add those files
-before building the image if they are not already supplied by the application
-implementation.
 
 ## Prerequisites
 
@@ -179,10 +178,9 @@ authentication, image publishing, rollback, or automated tests.
 
 ## Troubleshooting
 
-### The Flask container exits during build
+### The Flask container exits during build or startup
 
-Confirm that `requirements.txt` and `app.py` exist in the repository root.
-Then rebuild and inspect the logs:
+Rebuild and inspect the logs:
 
 ```bash
 docker compose build --no-cache flask
@@ -220,5 +218,7 @@ running.
 - Both services use `restart: always`.
 - The Flask image installs `gcc`, `default-libmysqlclient-dev`, and `pkg-config`
   to support packages that require `mysqlclient`.
-- The application should provide a `/health` route returning a successful HTTP
-  response for the Compose health check to pass.
+-   - `app.py` creates the `tasks` table automatically when the container starts.
+  - The `/` route displays tasks and accepts new tasks through the form.
+  - The `/tasks/<id>/delete` route removes a task.
+  - The `/health` route checks both the Flask process and its MySQL connection.
