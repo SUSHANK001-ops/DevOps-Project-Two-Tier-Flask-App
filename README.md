@@ -18,7 +18,7 @@ keeps the database data across container restarts.
 | [`requirements.txt`](./requirements.txt) | Python dependencies installed into the Flask image. |
 | [`templates/index.html`](./templates/index.html) | User interface for the task board. |
 | [`static/style.css`](./static/style.css) | Styling for the web interface. |
-| [`Dockerfile`](./Dockerfile) | Builds the Flask application image with Python 3.9. |
+| [`Dockerfile`](./Dockerfile) | Builds the Flask application image with Python 3.12. |
 | [`docker-compose.yml`](./docker-compose.yml) | Runs the Flask and MySQL services together. |
 | [`Jenkinsfile`](./Jenkinsfile) | Defines the Jenkins build and deployment pipeline. |
 
@@ -44,7 +44,7 @@ Clone the repository and start the services:
 ```bash
 git clone https://github.com/SUSHANK001-ops/DevOps-Project-Two-Tier-Flask-App.git
 cd DevOps-Project-Two-Tier-Flask-App
-docker compose up -d --build
+docker compose up -d --build --wait --wait-timeout 120
 ```
 
 The `--build` option rebuilds the Flask image from the current source. To
@@ -127,19 +127,7 @@ Jenkins checks out the `main` branch from:
 https://github.com/SUSHANK001-ops/DevOps-Project-Two-Tier-Flask-App.git
 ```
 
-### 2. Build Docker Image
-
-The agent builds the application image:
-
-```bash
-docker build -t flask-app:latest .
-```
-
-The image is tagged as `flask-app:latest`. It is used locally by the
-deployment environment and is not pushed to a container registry by this
-pipeline.
-
-### 3. Deploy with Docker Compose
+### 2. Deploy with Docker Compose
 
 The pipeline first attempts to stop any existing deployment:
 
@@ -154,9 +142,10 @@ exists. It then rebuilds and starts the services in detached mode:
 docker compose up -d --build
 ```
 
-This means a successful Jenkins build leaves the Flask and MySQL containers
-running on the Jenkins agent itself. The Jenkins agent must therefore be the
-machine intended to host the application.
+The pipeline waits up to 120 seconds for both services to become healthy and
+prints their final status. A successful build leaves the Flask and MySQL
+containers running on the Jenkins agent itself. The Jenkins agent must
+therefore be the machine intended to host the application.
 
 ## Configure Jenkins
 
